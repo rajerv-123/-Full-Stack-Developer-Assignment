@@ -1,52 +1,54 @@
 import React, { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Snackbar, Alert } from "@mui/material";
 
-const Login = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-  const [openSuccess, setOpenSuccess] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [successMsg, setSuccessMsg] = useState<string>("");
+  const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
- const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
-  setSuccessMsg("");
-  setOpenSuccess(false);
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMsg("");
+    setOpenSuccess(false);
 
-  if (!email || !password) {
-    setError("Please enter both email and password.");
-    return;
-  }
+    if (!email || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
 
-  try {
-    const res = await axios.post("http://localhost:5000/api/auth/login", {
-      email,
-      password,
-    });
+    try {
+      const res = await axios.post<{ token: string }>(
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("isLoggedIn", "true");
 
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("isLoggedIn", "true");
+      setSuccessMsg("Login successful! Redirecting...");
+      setOpenSuccess(true);
 
-    setSuccessMsg("Login successful! Redirecting...");
-    setOpenSuccess(true);
+      setEmail("");
+      setPassword("");
 
-    setEmail("");
-    setPassword("");
-
-    setTimeout(() => {
-      navigate("/search");
-    }, 1500);
-  } catch (err) {
-    console.error(err);
-    setError("Invalid email or password.");
-  }
-};
-
+      setTimeout(() => {
+        navigate("/search");
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setError("Invalid email or password.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 px-4">
@@ -64,7 +66,9 @@ const Login = () => {
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
             className="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
           />
 
@@ -72,7 +76,9 @@ const Login = () => {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
             className="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
           />
 

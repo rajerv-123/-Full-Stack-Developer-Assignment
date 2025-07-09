@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import type { ChangeEvent } from "react";
 import axios from "axios";
 import {
   Card,
@@ -14,11 +15,30 @@ import {
   Stack,
 } from "@mui/material";
 
-const SearchResults = () => {
-  const [projects, setProjects] = useState([]);
-  const [comments, setComments] = useState({});
+// Define types
+interface User {
+  name: string;
+}
+
+interface Comment {
+  text: string;
+  createdAt: string;
+}
+
+interface Project {
+  _id: string;
+  title: string;
+  description: string;
+  link?: string;
+  user?: User;
+  comments?: Comment[];
+}
+
+const SearchResults: React.FC = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [comments, setComments] = useState<Record<string, string>>({});
   const [query, setQuery] = useState("");
-  const [typingTimeout, setTypingTimeout] = useState(0);
+  const [typingTimeout, setTypingTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetchProjects();
@@ -27,33 +47,34 @@ const SearchResults = () => {
   const fetchProjects = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/projects");
-      setProjects(res.data);
+      setProjects(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error fetching projects:", err);
     }
   };
 
-  const handleSearch = async (value) => {
+  const handleSearch = async (value: string) => {
     if (typingTimeout) clearTimeout(typingTimeout);
-    setTypingTimeout(
-      setTimeout(async () => {
-        try {
-          const res = await axios.get(
-            `http://localhost:5000/api/projects/search?q=${value}`
-          );
-          setProjects(res.data.projects);
-        } catch (err) {
-          console.error("Search error:", err);
-        }
-      }, 400)
-    );
+
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/projects/search?q=${value}`
+        );
+        setProjects(res.data.projects || []);
+      } catch (err) {
+        console.error("Search error:", err);
+      }
+    }, 400);
+
+    setTypingTimeout(timeout);
   };
 
-  const handleCommentChange = (projectId, value) => {
+  const handleCommentChange = (projectId: string, value: string) => {
     setComments((prev) => ({ ...prev, [projectId]: value }));
   };
 
-  const handleSubmitComment = async (projectId) => {
+  const handleSubmitComment = async (projectId: string) => {
     const commentText = comments[projectId];
     if (!commentText) return;
 
@@ -97,7 +118,7 @@ const SearchResults = () => {
           variant="outlined"
           placeholder="Search by title or creator name..."
           value={query}
-          onChange={(e) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setQuery(e.target.value);
             handleSearch(e.target.value);
           }}
@@ -169,7 +190,7 @@ const SearchResults = () => {
                 )}
 
                 {/* Show Comments */}
-                {project.comments?.length > 0 && (
+                {project.comments && project.comments.length > 0 && (
                   <>
                     <Typography mt={3} fontWeight="medium">
                       💬 Comments
@@ -203,7 +224,7 @@ const SearchResults = () => {
                   label="Add a comment"
                   placeholder="Write your thoughts..."
                   value={comments[project._id] || ""}
-                  onChange={(e) =>
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     handleCommentChange(project._id, e.target.value)
                   }
                   sx={{ mt: 2 }}

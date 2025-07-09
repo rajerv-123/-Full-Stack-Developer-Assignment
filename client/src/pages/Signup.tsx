@@ -8,12 +8,16 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError("");
     setSuccess("");
     try {
-      await axios.post("http://localhost:5000/api/auth/register", form);
+      await axios.post(
+        "http://localhost:5000/api/auth/register",
+        form
+      );
       setSuccess("Signup successful! 🎉");
       setForm({ name: "", email: "", password: "" });
     } catch (err) {

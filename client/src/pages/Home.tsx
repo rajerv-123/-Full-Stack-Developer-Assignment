@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 import axios from "axios";
 import {
   Table,
@@ -18,12 +19,32 @@ import {
   TablePagination,
 } from "@mui/material";
 
-const Home = () => {
-  const [projects, setProjects] = useState([]);
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [comment, setComment] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Default rows per page
+// Interfaces for data
+interface Comment {
+  _id: string;
+  text: string;
+  createdAt: string;
+}
+
+interface User {
+  name?: string;
+}
+
+interface Project {
+  _id: string;
+  title: string;
+  description: string;
+  link?: string;
+  user?: User;
+  comments?: Comment[];
+}
+
+const Home: React.FC = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [comment, setComment] = useState<string>("");
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
   useEffect(() => {
     fetchProjects();
@@ -31,16 +52,20 @@ const Home = () => {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/projects");
+      const res = await axios.get<Project[]>(
+        "http://localhost:5000/api/projects"
+      );
       setProjects(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error fetching projects:", err);
     }
   };
 
-  const handleView = async (id) => {
+  const handleView = async (id: string) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/projects/${id}`);
+      const res = await axios.get<Project>(
+        `http://localhost:5000/api/projects/${id}`
+      );
       setSelectedProject(res.data);
     } catch (err) {
       console.error("Error loading project:", err);
@@ -48,7 +73,7 @@ const Home = () => {
   };
 
   const handleSubmitComment = async () => {
-    if (!comment) return;
+    if (!comment || !selectedProject) return;
     try {
       await axios.post(
         `http://localhost:5000/api/projects/${selectedProject._id}/comments`,
@@ -69,11 +94,11 @@ const Home = () => {
   };
 
   // Pagination handlers
-  const handleChangePage = (_, newPage) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -187,8 +212,8 @@ const Home = () => {
               <Typography variant="subtitle1" mt={2} mb={1} fontWeight="bold">
                 💬 Comments
               </Typography>
-              {selectedProject.comments?.length > 0 ? (
-                selectedProject.comments.map((c) => (
+              {(selectedProject.comments?.length ?? 0) > 0 ? (
+                selectedProject.comments!.map((c) => (
                   <Typography
                     key={c._id}
                     variant="body2"

@@ -1,16 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import 'antd/dist/reset.css';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
-import ProjectForm from './pages/ProjectForm';
-import ProjectDetails from './pages/ProjectDetails';
-import SearchResults from './pages/SearchResults';
-import './App.css';
-
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "antd/dist/reset.css";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import ProjectForm from "./pages/ProjectForm";
+import ProjectDetails from "./pages/ProjectDetails";
+import SearchResults from "./pages/SearchResults";
+import "./App.css";
 
 function App() {
   return (

@@ -1,15 +1,28 @@
 import React, { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 
-const ProjectForm = () => {
-  const [form, setForm] = useState({ title: "", description: "", link: "" });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+interface ProjectFormData {
+  title: string;
+  description: string;
+  link?: string;
+}
 
-  const handleSubmit = async (e) => {
+const ProjectForm: React.FC = () => {
+  const [form, setForm] = useState<ProjectFormData>({
+    title: "",
+    description: "",
+    link: "",
+  });
+
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
     try {
       await axios.post("http://localhost:5000/api/projects", form, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -20,6 +33,12 @@ const ProjectForm = () => {
       setError("Failed to post project. Please try again.");
       console.error(err);
     }
+  };
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   return (
@@ -39,28 +58,30 @@ const ProjectForm = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <input
             type="text"
+            name="title"
             placeholder="Project Title"
             value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            onChange={handleChange}
             className="px-4 py-2 rounded-lg bg-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
             required
           />
 
           <textarea
+            name="description"
             placeholder="Project Description"
             value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            onChange={handleChange}
             className="px-4 py-2 h-32 rounded-lg bg-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
             required
           />
 
           <input
-            // type="url"
+            type="url"
+            name="link"
             placeholder="Project Link (e.g., GitHub)"
             value={form.link}
-            onChange={(e) => setForm({ ...form, link: e.target.value })}
+            onChange={handleChange}
             className="px-4 py-2 rounded-lg bg-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
-            // required
           />
 
           <button

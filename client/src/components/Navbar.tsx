@@ -3,9 +3,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu as MenuIcon, X, ChevronDown } from "lucide-react";
 import { Menu, Transition } from "@headlessui/react";
 
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+type MenuItemRenderProps = {
+  active: boolean;
+};
+
+const Navbar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -50,7 +55,7 @@ const Navbar = () => {
                 <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                   <div className="py-1">
                     <Menu.Item>
-                      {({ active }) => (
+                      {({ active }: MenuItemRenderProps) => (
                         <Link
                           to="/dashboard"
                           className={`${
@@ -62,7 +67,7 @@ const Navbar = () => {
                       )}
                     </Menu.Item>
                     <Menu.Item>
-                      {({ active }) => (
+                      {({ active }: MenuItemRenderProps) => (
                         <Link
                           to="/post-project"
                           className={`${
@@ -74,7 +79,7 @@ const Navbar = () => {
                       )}
                     </Menu.Item>
                     <Menu.Item>
-                      {({ active }) => (
+                      {({ active }: MenuItemRenderProps) => (
                         <Link
                           to="/search"
                           className={`${
@@ -85,8 +90,8 @@ const Navbar = () => {
                         </Link>
                       )}
                     </Menu.Item>
-                     <Menu.Item>
-                      {({ active }) => (
+                    <Menu.Item>
+                      {({ active }: MenuItemRenderProps) => (
                         <Link
                           to="/home"
                           className={`${
@@ -98,7 +103,7 @@ const Navbar = () => {
                       )}
                     </Menu.Item>
                     <Menu.Item>
-                      {({ active }) => (
+                      {({ active }: MenuItemRenderProps) => (
                         <button
                           onClick={handleLogout}
                           className={`${
@@ -133,7 +138,6 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile menu toggle */}
         <button
           className="md:hidden text-blue-600"
           onClick={() => setIsOpen(!isOpen)}
@@ -142,7 +146,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden flex flex-col items-center space-y-4 pb-4">
           {isLoggedIn ? (

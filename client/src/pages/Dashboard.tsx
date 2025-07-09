@@ -1,19 +1,32 @@
 import React, { useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 import axios from "axios";
 
-const Dashboard = () => {
-  const [profile, setProfile] = useState({ name: "", email: "", bio: "" });
-  const [message, setMessage] = useState("");
+interface Profile {
+  name: string;
+  email: string;
+  bio: string;
+}
 
-  // Fetch user profile on mount
+const Dashboard: React.FC = () => {
+  const [profile, setProfile] = useState<Profile>({
+    name: "",
+    email: "",
+    bio: "",
+  });
+  const [message, setMessage] = useState<string>("");
+
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/profile", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const res = await axios.get<Profile>(
+          "http://localhost:5000/api/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
         setProfile(res.data);
       } catch (error) {
         console.error("Failed to fetch profile", error);
@@ -26,8 +39,11 @@ const Dashboard = () => {
   }, []);
 
   // Handle form field changes
-  const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
   // Save profile
