@@ -1,5 +1,4 @@
 import express from "express";
-import serverless from "serverless-http";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config.js";
@@ -8,7 +7,10 @@ import authRoutes from "./routes/auth.js";
 import profileRoutes from "./routes/profile.js";
 import projectRoutes from "./routes/projects.js";
 
+
 dotenv.config();
+
+
 await connectDB();
 
 const app = express();
@@ -21,4 +23,11 @@ app.use("/api/projects", projectRoutes);
 
 app.get("/", (req, res) => res.send("DevConnect API Running"));
 
-export const handler = serverless(app);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+});
+
+export default app;
